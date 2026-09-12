@@ -1,0 +1,39 @@
+name: Sync Whop catalog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: whop-catalog
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Read public Whop catalog
+        env:
+          WHOP_API_KEY: ${{ secrets.WHOP_API_KEY }}
+          WHOP_ACCOUNT_ID: ${{ secrets.WHOP_ACCOUNT_ID }}
+        run: node scripts/sync-whop.mjs
+
+      - name: Save catalog update
+        run: |
+          git config user.name 'HerDigitalArt catalog bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add products.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update public Whop catalog'
+            git push
+          fi
