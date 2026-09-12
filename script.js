@@ -1,7 +1,8 @@
 /* Public storefront only. Never add API keys to this file. */
 const params = new URLSearchParams(location.search);
 const preview = params.get('preview') === '1';
-const route = location.pathname.endsWith('product.html') ? 'product' : location.pathname.endsWith('shop.html') ? 'shop' : 'home';
+const path = location.pathname.replace(/\/+$/, '');
+const route = /(?:^|\/)product(?:\.html)?$/.test(path) ? 'product' : /(?:^|\/)shop(?:\.html)?$/.test(path) ? 'shop' : 'home';
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const link = (page, values={}) => { const q = new URLSearchParams(values); if(preview) q.set('preview','1'); return page + (q.size ? '?' + q : ''); };
 function safeUrl(value, image=false) { try { const u=new URL(value,location.href); if(image && u.origin===location.origin && !value.startsWith('//')) return u.href; if(u.protocol!=='https:') return ''; if(!image && !(u.hostname==='whop.com'||u.hostname.endsWith('.whop.com')))return ''; return u.href; } catch {return '';} }
