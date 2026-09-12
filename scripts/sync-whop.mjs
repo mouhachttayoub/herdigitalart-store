@@ -10,7 +10,7 @@ do{
  const response=await fetch(url,{headers:{Authorization:`Bearer ${key}`},signal:AbortSignal.timeout(30000)});
  if(!response.ok)throw Error(`Whop catalog request failed (${response.status}). Existing catalog was preserved.`);
  const body=await response.json();if(!Array.isArray(body.data)||!body.page_info)throw Error('Unexpected Whop response; existing catalog preserved.');
- for(const p of body.data){if(p.visibility!=='visible')continue;const o=overrides[p.id]||{};
+ for(const p of body.data){const o=overrides[p.id]||{};if(p.visibility!=='visible'||o.exclude===true)continue;
  // Only explicitly public fields are copied. Do not serialize the API response wholesale.
  const checkout=typeof o.checkoutUrl==='string'?o.checkoutUrl:'';
  if(checkout){const u=new URL(checkout);if(u.protocol!=='https:'||!(u.hostname==='whop.com'||u.hostname.endsWith('.whop.com')))throw Error('Checkout overrides must be HTTPS Whop URLs.');}
