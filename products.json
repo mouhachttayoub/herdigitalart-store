@@ -1,18 +1,18 @@
 {
-  "updatedAt": "2026-09-14T06:22:45.945Z",
+  "updatedAt": "2026-09-14T12:57:47.607Z",
   "products": [
     {
       "id": "prod_3FkrHN5j7fOxX",
       "title": "Postpartum Mental Load Workbook for Couples, Printable New Parent Planner and Fi",
       "description": "Postpartum Mental Load Workbook for Couples, Printable",
       "image": "https://assets-2-prod.whop.com/public/uploads/2026-09-11/1b0e42f3-9549-4e29-98fb-9a5734f8c692/image.png",
-      "category": "Digital Resources",
-      "format": "Digital download",
+      "category": "Life & Relationships",
+      "format": "40-page fillable and printable PDF workbook",
       "createdAt": "2026-09-11T21:07:54.029Z",
-      "checkoutUrl": "",
+      "checkoutUrl": "https://whop.com/womenstuffart/postpartum-mental-load-workbook-for-couples-printable-new-parent-planner-and-fi/",
       "price": null,
       "currency": "USD",
-      "featured": false,
+      "featured": true,
       "bestsellerRank": null
     }
   ]
