@@ -1,0 +1,31 @@
+import {readFile,access} from 'node:fs/promises';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const root=new URL('../',import.meta.url),source=await readFile(new URL('script.js',root),'utf8');
+const sample=JSON.parse(await readFile(new URL('preview-products.json',root),'utf8'));
+for(const file of ['index.html','shop.html','product.html','styles.css','images/favicon.svg',...sample.products.map(p=>p.image)])await access(new URL(file,root));
+for(const file of ['products.json','preview-products.json','product-overrides.json'])JSON.parse(await readFile(new URL(file,root),'utf8'));
+const preview=await readFile(new URL('preview.html',root),'utf8');new vm.Script(preview.match(/<script>([\s\S]*)<\/script>/)[1]);
+function dom(){const nodes=new Map();return {nodes,querySelector(s){if(!nodes.has(s))nodes.set(s,{innerHTML:'',textContent:'',value:s==='#sort'?'newest':'',dataset:{},hidden:false,classList:{toggle(){}},addEventListener(){},replaceChildren(){},setAttribute(){},getAttribute(){return 'false';}});return nodes.get(s);},querySelectorAll(){return [];},createElement(){return {};},head:{append(){}}};}
+async function run(path='shop.html',search='?preview=1',data=sample){const document=dom();const context=vm.createContext({document,location:{pathname:'/'+path,search,href:'https://example.com/'+path+search,origin:'https://example.com'},URL,URLSearchParams,Intl,console,fetch:async()=>({ok:true,json:async()=>data})});vm.runInContext(source,context);await new Promise(resolve=>setImmediate(resolve));return {document,context};}
+let {document,context}=await run();assert.equal((document.querySelector('#products').innerHTML.match(/class="card"/g)||[]).length,3);
+document.querySelector('#search').value='learning';vm.runInContext('render()',context);assert.match(document.querySelector('#products').innerHTML,/The Speed Learning Guide/);assert.doesNotMatch(document.querySelector('#products').innerHTML,/43 Editable/);
+document.querySelector('#search').value='';vm.runInContext("category='Business & Templates';render()",context);assert.match(document.querySelector('#products').innerHTML,/43 Editable/);assert.doesNotMatch(document.querySelector('#products').innerHTML,/Speed Learning/);
+assert.equal(vm.runInContext("safeUrl('javascript:alert(1)')",context),'');assert.equal(vm.runInContext("safeUrl('https://whop.com.evil.com')",context),'');assert.equal(vm.runInContext("safeUrl('https://whop.com/checkout/real')",context),'https://whop.com/checkout/real');
+({document}=await run('product.html','?preview=1&id=labels'));assert.match(document.querySelector('#main').innerHTML,/Design preview only/);
+({document}=await run('product.html','?id=missing',{products:[]}));assert.match(document.querySelector('#main').innerHTML,/Resource not found/);
+({document}=await run('index.html','',{products:[]}));assert.match(document.querySelector('#products').innerHTML,/A new collection/);
+assert.equal(document.querySelector('#home-edit').hidden,true);
+assert.equal(document.querySelector('#home-arrivals').hidden,true);
+({document}=await run('index.html','?preview=1'));
+assert.equal(document.querySelector('#home-edit').hidden,false);
+assert.equal((document.querySelector('#home-featured').innerHTML.match(/class="home-feature"/g)||[]).length,2);
+assert.doesNotMatch(document.querySelector('#home-featured').innerHTML,/BESTSELLER/);
+assert.ok(document.querySelector('#home-new').innerHTML.indexOf('The Speed Learning Guide')<document.querySelector('#home-new').innerHTML.indexOf('43 Editable'));
+({document}=await run('index.html','?preview=1',{products:sample.products.map((p,i)=>({...p,bestsellerRank:i===1?1:null}))}));
+assert.match(document.querySelector('#home-featured').innerHTML,/BESTSELLER/);
+assert.match(document.querySelector('#home-featured').innerHTML,/The Speed Learning Guide/);
+assert.equal(document.querySelector('#edit-label').textContent,'BESTSELLING PRODUCTS');
+({document}=await run('shop.html','?preview=1&search=template'));
+assert.doesNotMatch(document.querySelector('#products').innerHTML,/The Speed Learning Guide/);
+console.log('PASS: file references, JSON, JS syntax, self-contained preview syntax, catalog rendering, search, category filter, URL protection, preview checkout disabled, missing product, live empty state. Browser visual QA not included in this check.');

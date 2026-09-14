@@ -1,0 +1,78 @@
+/* Whop storefront compatibility and HerDigitalArt identity */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 0 auto;
+}
+
+.brand-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 24%;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+}
+
+.footer .brand-avatar {
+  width: 58px;
+  height: 58px;
+}
+
+/* Whop listing media is landscape. Keep the original artwork visible without
+   forcing it into tall, empty square containers. */
+.card-media {
+  aspect-ratio: 16 / 9 !important;
+  padding: 0;
+  background: #fff;
+}
+
+.card-media img,
+.home-feature-media img,
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.home-feature-media {
+  aspect-ratio: 16 / 9;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+.home-feature-media img {
+  aspect-ratio: auto !important;
+  border-radius: inherit;
+}
+
+.home-feature-number {
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  box-shadow: 0 1px 0 rgba(20, 43, 98, .16);
+}
+
+.detail-grid > div:first-child {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.detail-image {
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+}
+
+@media (max-width: 650px) {
+  .brand-avatar { width: 36px; height: 36px; }
+  .wordmark { font-size: 25px !important; }
+  .home-feature-media,
+  .card-media,
+  .detail-grid > div:first-child { aspect-ratio: 16 / 9 !important; }
+}
